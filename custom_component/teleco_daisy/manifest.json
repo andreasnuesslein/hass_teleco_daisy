@@ -1,0 +1,12 @@
+{
+  "domain": "teleco_daisy",
+  "name": "Teleco Daisy",
+  "version": "0.1.0",
+  "iot_class": "cloud_polling",
+  "config_flow": true,
+  "dependencies": [],
+  "requirements": [
+    "teleco_daisy>=0.1.0"
+  ],
+  "zeroconf": []
+}
