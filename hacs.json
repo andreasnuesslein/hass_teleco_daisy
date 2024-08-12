@@ -1,4 +1,5 @@
 {
   "name": "Teleco Automation Daisy connection",
-  "homeassistant": "2024"
+  "homeassistant": "2024",
+  "render_readme": true
 }
