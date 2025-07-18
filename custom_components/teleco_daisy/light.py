@@ -13,7 +13,7 @@ from homeassistant.components.light import (
     LightEntityDescription,
     ATTR_RGB_COLOR,
 )
-from teleco_daisy import DaisyLight
+from teleco_daisy import DaisyWhiteLight, DaisyRGBLight
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.device_registry import DeviceInfo
 
@@ -38,7 +38,7 @@ class TelecoDaisyLight(LightEntity):
         key="teleco_daisy_light", has_entity_name=True, name=None
     )
 
-    def __init__(self, light: DaisyLight) -> None:
+    def __init__(self, light: DaisyWhiteLight | DaisyRGBLight) -> None:
         self._light = light
         self._name = light.label
         self._attr_is_on = light.is_on

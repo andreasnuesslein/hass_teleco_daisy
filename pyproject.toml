@@ -1,20 +1,15 @@
-[tool.poetry]
+[project]
 name = "hass-teleco-daisy"
-version = "0.1.0"
+version = "0.1.2"
 description = "Home Assistant custom component for Teleco Automation Daisy"
-authors = []
-license = ""
 readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "teleco-daisy>=0.1.2",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-teleco_daisy = "^0.1.0"
-
-
-[tool.poetry.group.dev.dependencies]
-homeassistant = ">2023"
-black = "*"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[dependency-groups]
+dev = [
+    "homeassistant>=2023.7.3",
+    "ruff>=0.12.4",
+]

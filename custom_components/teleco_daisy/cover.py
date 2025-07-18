@@ -10,7 +10,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.device_registry import DeviceInfo
 
 from .const import DOMAIN
-from teleco_daisy import DaisyCover
+from teleco_daisy import DaisyAwningsCover, DaisySlatsCover
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ async def async_setup_entry(
 
 
 class TelecoDaisyCover(CoverEntity):
-    def __init__(self, cover: DaisyCover) -> None:
+    def __init__(self, cover: DaisyAwningsCover | DaisySlatsCover) -> None:
         self._cover = cover
         self._attr_is_closed = self._cover.is_closed
         self._attr_current_cover_position = self._cover.position

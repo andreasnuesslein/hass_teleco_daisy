@@ -4,12 +4,12 @@
   "documentation": "https://github.com/andreasnuesslein/hass_teleco_daisy",
   "issue_tracker": "https://github.com/andreasnuesslein/hass_teleco_daisy/issues",
   "codeowners": [],
-  "version": "0.1.0",
+  "version": "0.1.2",
   "iot_class": "cloud_polling",
   "config_flow": true,
   "dependencies": ["http"],
   "requirements": [
-    "teleco_daisy>=0.1.0"
+    "teleco_daisy>=0.1.2"
   ],
   "zeroconf": []
 }
