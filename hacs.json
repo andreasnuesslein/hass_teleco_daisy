@@ -1,5 +1,4 @@
 {
-  "domain": "teleco_daisy",
   "name": "Teleco Automation Daisy connection",
   "homeassistant": "2024",
   "render_readme": true
