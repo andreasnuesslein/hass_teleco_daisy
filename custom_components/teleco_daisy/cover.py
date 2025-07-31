@@ -3,7 +3,13 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from homeassistant.components.cover import CoverEntity, CoverDeviceClass, ATTR_POSITION
+from homeassistant.components.cover import (
+    CoverEntity,
+    CoverDeviceClass,
+    ATTR_POSITION,
+    ATTR_TILT_POSITION,
+    CoverEntityFeature,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -27,13 +33,26 @@ async def async_setup_entry(
 class TelecoDaisyCover(CoverEntity):
     def __init__(self, cover: DaisyAwningsCover | DaisySlatsCover) -> None:
         self._cover = cover
-        self._attr_is_closed = self._cover.is_closed
-        self._attr_current_cover_position = self._cover.position
 
         self._attr_unique_id = str(cover.idInstallationDevice)
         self._attr_name = cover.label
-        self._attr_device_class = CoverDeviceClass.AWNING
-        self._attr_available = True
+
+        if isinstance(cover, DaisyAwningsCover):
+            self._attr_device_class = CoverDeviceClass.AWNING
+            self._attr_supported_features = (
+                CoverEntityFeature.OPEN
+                | CoverEntityFeature.CLOSE
+                | CoverEntityFeature.SET_POSITION
+                | CoverEntityFeature.STOP
+            )
+        elif isinstance(cover, DaisySlatsCover):
+            self._attr_device_class = CoverDeviceClass.BLIND
+            self._attr_supported_features = (
+                CoverEntityFeature.OPEN_TILT
+                | CoverEntityFeature.CLOSE_TILT
+                | CoverEntityFeature.SET_TILT_POSITION
+                | CoverEntityFeature.STOP_TILT
+            )
 
     @property
     def device_info(self) -> DeviceInfo:
@@ -42,6 +61,18 @@ class TelecoDaisyCover(CoverEntity):
             name=self._attr_name,
             manufacturer="Teleco Automation",
         )
+
+    @property
+    def is_closed(self) -> bool | None:
+        return self._cover.is_closed
+
+    @property
+    def current_cover_position(self) -> int | None:
+        return self._cover.position
+
+    @property
+    def current_cover_tilt_position(self) -> int | None:
+        return self._cover.position
 
     # @property
     # def is_closing(self) -> bool:
@@ -61,18 +92,9 @@ class TelecoDaisyCover(CoverEntity):
         self._cover.close_cover()
         self.update()
 
-    def stop_cover(self, **kwargs: Any) -> None:
-        self._cover.stop_cover()
-        self.update()
-
-    def update(self) -> None:
-        self._cover.update_state()
-        self._attr_is_closed = self._cover.is_closed
-        self._attr_current_cover_position = self._cover.position
-
     def set_cover_position(self, **kwargs: Any) -> None:
         position = kwargs[ATTR_POSITION]
-        if 0 < position < 15:
+        if position < 15:
             self._cover.close_cover()
         elif 16 < position < 48:
             self._cover.open_cover("33")
@@ -81,3 +103,33 @@ class TelecoDaisyCover(CoverEntity):
         else:
             self._cover.open_cover("100")
         self.update()
+
+    def stop_cover(self, **kwargs: Any) -> None:
+        self._cover.stop_cover()
+        self.update()
+
+    def open_cover_tilt(self, **kwargs: Any) -> None:
+        self.open_cover(**kwargs)
+
+    def close_cover_tilt(self, **kwargs: Any) -> None:
+        self.close_cover(**kwargs)
+
+    def set_cover_tilt_position(self, **kwargs: Any) -> None:
+        position = kwargs[ATTR_TILT_POSITION]
+        if position < 15:
+            self._cover.close_cover()
+        elif 16 < position < 48:
+            self._cover.open_cover("33")
+        elif 49 < position < 81:
+            self._cover.open_cover("66")
+        else:
+            self._cover.open_cover("100")
+        self.update()
+
+    def stop_cover_tilt(self, **kwargs: Any) -> None:
+        self.stop_cover(**kwargs)
+
+    def update(self) -> None:
+        self._cover.update_state()
+        self._attr_is_closed = self._cover.is_closed
+        self._attr_current_cover_position = self._cover.position
