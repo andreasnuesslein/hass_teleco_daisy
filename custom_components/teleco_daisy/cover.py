@@ -94,11 +94,11 @@ class TelecoDaisyCover(CoverEntity):
 
     def set_cover_position(self, **kwargs: Any) -> None:
         position = kwargs[ATTR_POSITION]
-        if position < 15:
+        if position <= 15:
             self._cover.close_cover()
-        elif 16 < position < 48:
+        elif 15 < position <= 48:
             self._cover.open_cover("33")
-        elif 49 < position < 81:
+        elif 48 < position <= 81:
             self._cover.open_cover("66")
         else:
             self._cover.open_cover("100")
@@ -116,11 +116,11 @@ class TelecoDaisyCover(CoverEntity):
 
     def set_cover_tilt_position(self, **kwargs: Any) -> None:
         position = kwargs[ATTR_TILT_POSITION]
-        if position < 15:
+        if position <= 15:
             self._cover.close_cover()
-        elif 16 < position < 48:
+        elif 15 < position <= 48:
             self._cover.open_cover("33")
-        elif 49 < position < 81:
+        elif 48 < position <= 81:
             self._cover.open_cover("66")
         else:
             self._cover.open_cover("100")
