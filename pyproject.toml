@@ -5,7 +5,7 @@ description = "Home Assistant custom component for Teleco Automation Daisy"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "teleco-daisy>=0.1.4",
+    "teleco-daisy>=0.1.5",
 ]
 
 [dependency-groups]

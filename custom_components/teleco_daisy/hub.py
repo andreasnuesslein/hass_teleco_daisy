@@ -7,6 +7,7 @@ from teleco_daisy import (
     DaisyRGBLight,
     DaisyAwningsCover,
     DaisySlatsCover,
+    DaisyHeater4CH,
 )
 
 
@@ -14,6 +15,7 @@ class DaisyHub(TelecoDaisy):
     manufacturer = "Teleco Automation"
     lights = []
     covers = []
+    heaters = []
 
     def __init__(self, hass: HomeAssistant, email: str, password: str) -> None:
         super().__init__(email, password)
@@ -27,6 +29,7 @@ class DaisyHub(TelecoDaisy):
     def fetch_entities(self):
         self.lights = []
         self.covers = []
+        self.heaters = []
         for installation in self.get_account_installation_list():
             for room in self.get_room_list(installation):
                 for device in room.deviceList:
@@ -34,6 +37,8 @@ class DaisyHub(TelecoDaisy):
                         self.lights += [device]
                     elif isinstance(device, DaisyAwningsCover | DaisySlatsCover):
                         self.covers += [device]
+                    elif isinstance(device, DaisyHeater4CH):
+                        self.heaters += [device]
 
     @property
     def hub_id(self) -> str:
