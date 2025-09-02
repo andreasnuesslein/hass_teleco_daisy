@@ -38,7 +38,8 @@ class TelecoDaisyClimateEntity(ClimateEntity):
             | ClimateEntityFeature.PRESET_MODE
         )
         self.preset_modes = ["50", "75", "100"]
-        # FIXME This is a workaround for the fact that teleco_daisy does not report the current preset mode
+        # FIXME This is a workaround for the fact that teleco_daisy does not
+        #  report the current preset mode
         self._preset_mode = None
 
     @property
@@ -61,5 +62,6 @@ class TelecoDaisyClimateEntity(ClimateEntity):
 
     @property
     def preset_mode(self) -> str | None:
-        # FIXME This is a workaround for the fact that teleco_daisy does not report the current preset mode
+        # FIXME This is a workaround for the fact that teleco_daisy does not
+        #  report the current preset mode
         return self._preset_mode

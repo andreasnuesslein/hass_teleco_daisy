@@ -7,9 +7,9 @@ from teleco_daisy import DaisyCover, DaisyHeater4CH, DaisyLight, TelecoDaisy
 
 class DaisyHub(TelecoDaisy):
     manufacturer = "Teleco Automation"
-    lights = []
-    covers = []
-    heaters = []
+    lights: list[DaisyLight]
+    covers: list[DaisyCover]
+    heaters: list[DaisyHeater4CH]
 
     def __init__(self, hass: HomeAssistant, email: str, password: str) -> None:
         super().__init__(email, password)
