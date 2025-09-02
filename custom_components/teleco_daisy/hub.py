@@ -1,14 +1,7 @@
 from __future__ import annotations
 from homeassistant.core import HomeAssistant
 
-from teleco_daisy import (
-    TelecoDaisy,
-    DaisyWhiteLight,
-    DaisyRGBLight,
-    DaisyAwningsCover,
-    DaisySlatsCover,
-    DaisyHeater4CH,
-)
+from teleco_daisy import TelecoDaisy, DaisyLight, DaisyCover, DaisyHeater4CH
 
 
 class DaisyHub(TelecoDaisy):
@@ -33,9 +26,9 @@ class DaisyHub(TelecoDaisy):
         for installation in self.get_account_installation_list():
             for room in self.get_room_list(installation):
                 for device in room.deviceList:
-                    if isinstance(device, DaisyWhiteLight | DaisyRGBLight):
+                    if isinstance(device, DaisyLight):
                         self.lights += [device]
-                    elif isinstance(device, DaisyAwningsCover | DaisySlatsCover):
+                    elif isinstance(device, DaisyCover):
                         self.covers += [device]
                     elif isinstance(device, DaisyHeater4CH):
                         self.heaters += [device]
