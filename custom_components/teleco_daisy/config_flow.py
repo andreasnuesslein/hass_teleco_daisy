@@ -1,10 +1,9 @@
 import logging
-from typing import Any, Dict, Optional
-
-from homeassistant import config_entries
-from homeassistant.const import CONF_USERNAME, CONF_PASSWORD
+from typing import Any
 
 import voluptuous as vol
+from homeassistant import config_entries
+from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 
 from .const import DOMAIN
 
@@ -20,10 +19,10 @@ class TelecoDaisyConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     MINOR_VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
 
-    data: Optional[Dict[str, Any]]
+    data: dict[str, Any] | None
 
-    async def async_step_user(self, user_input: Optional[Dict[str, Any]] = None):
-        errors: Dict[str, str] = {}
+    async def async_step_user(self, user_input: dict[str, Any] | None = None):
+        errors: dict[str, str] = {}
         if user_input is not None:
             self.data = user_input
             return self.async_create_entry(title="Teleco Daisy", data=self.data)

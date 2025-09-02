@@ -1,7 +1,8 @@
 from __future__ import annotations
+
 from homeassistant.core import HomeAssistant
 
-from teleco_daisy import TelecoDaisy, DaisyLight, DaisyCover, DaisyHeater4CH
+from teleco_daisy import DaisyCover, DaisyHeater4CH, DaisyLight, TelecoDaisy
 
 
 class DaisyHub(TelecoDaisy):

@@ -1,24 +1,23 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Optional
-
-from homeassistant.util.color import value_to_brightness, brightness_to_value
-
-from .const import DOMAIN
+from typing import Any
 
 from homeassistant import config_entries, core
-
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
-    LightEntity,
-    ColorMode,
-    LightEntityDescription,
     ATTR_RGB_COLOR,
+    ColorMode,
+    LightEntity,
+    LightEntityDescription,
 )
-from teleco_daisy import DaisyWhiteLight, DaisyRGBLight
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.util.color import brightness_to_value, value_to_brightness
+
+from teleco_daisy import DaisyRGBLight, DaisyWhiteLight
+
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -75,7 +74,7 @@ class TelecoDaisyLight(LightEntity):
         return self._light.is_on
 
     @property
-    def brightness(self) -> Optional[int]:
+    def brightness(self) -> int | None:
         """Return the current brightness."""
         return (
             value_to_brightness(BRIGHTNESS_SCALE, self._light.brightness)
