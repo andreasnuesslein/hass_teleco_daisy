@@ -1965,7 +1965,7 @@ wheels = [
 
 [[package]]
 name = "hass-teleco-daisy"
-version = "0.1.8"
+version = "0.1.10"
 source = { virtual = "." }
 dependencies = [
     { name = "teleco-daisy" },
@@ -1981,7 +1981,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "teleco-daisy", specifier = "==0.1.8" }]
+requires-dist = [{ name = "teleco-daisy", specifier = "==0.1.11" }]
 
 [package.metadata.requires-dev]
 dev = [
@@ -4302,7 +4302,7 @@ wheels = [
 
 [[package]]
 name = "teleco-daisy"
-version = "0.1.8"
+version = "0.1.11"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
@@ -4310,9 +4310,9 @@ dependencies = [
     { name = "requests", version = "2.32.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' and python_full_version < '3.13.2'" },
     { name = "requests", version = "2.32.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13.2'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/16/eb/5b7789e773755e994b75816ee6e33c127fb215bea0a83dbf8914bc5d6b62/teleco_daisy-0.1.8.tar.gz", hash = "sha256:5021d41e3a5e4a7623658f3391bc14583d374e4dceb9bf7747c32e54e705cf86", size = 6000, upload-time = "2025-09-01T08:40:27.909Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/12/59/2560306933bcf12b8d2a130b152dd71fc9d0b2d96c94b773cf17f5b9f5a4/teleco_daisy-0.1.11.tar.gz", hash = "sha256:639757c5d9d3af6a9dc80f90c5475e8ce6c99c06513700e22fae57b2ac394e1b", size = 6537, upload-time = "2025-09-04T09:45:41.643Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0e/83/43d22e92e735890189594f271bf256d30dcd600596a176a985948a1832b3/teleco_daisy-0.1.8-py3-none-any.whl", hash = "sha256:50cc33480271fa5808d3cb31a081e6c611051d3fb603bb7b3900ccb97206eb7e", size = 6264, upload-time = "2025-09-01T08:40:26.827Z" },
+    { url = "https://files.pythonhosted.org/packages/e4/8e/df479cd58a162373d17340d49cb886e4e705f5209f1cf2813cf7f795ac33/teleco_daisy-0.1.11-py3-none-any.whl", hash = "sha256:92278522ed8b0acd106bf87cd34520f2b38540b8b8bcdb5317ff9dd64bb5302d", size = 6772, upload-time = "2025-09-04T09:45:40.85Z" },
 ]
 
 [[package]]

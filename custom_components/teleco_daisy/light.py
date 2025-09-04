@@ -15,7 +15,7 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util.color import brightness_to_value, value_to_brightness
 
-from teleco_daisy import DaisyRGBLight, DaisyWhiteLight
+from teleco_daisy import DaisyRGBLight, DaisyWhite4LevelLight
 
 from .const import DOMAIN
 
@@ -42,7 +42,7 @@ class TelecoDaisyLight(LightEntity):
         key="teleco_daisy_light", has_entity_name=True, name=None
     )
 
-    def __init__(self, light: DaisyWhiteLight | DaisyRGBLight) -> None:
+    def __init__(self, light: DaisyRGBLight | DaisyWhite4LevelLight) -> None:
         self._light = light
         self._name = self._light.label
 
@@ -53,7 +53,7 @@ class TelecoDaisyLight(LightEntity):
             self._attr_color_mode = ColorMode.RGB
             self._attr_supported_color_modes = {ColorMode.RGB}
 
-        elif isinstance(light, DaisyWhiteLight):
+        elif isinstance(light, DaisyWhite4LevelLight):
             self._attr_color_mode = ColorMode.BRIGHTNESS
             self._attr_supported_color_modes = {ColorMode.BRIGHTNESS}
 
@@ -89,6 +89,13 @@ class TelecoDaisyLight(LightEntity):
         return None
 
     def turn_on(self, **kwargs: Any) -> None:
+        if isinstance(self._light, DaisyRGBLight):
+            self._turn_on_rgb(**kwargs)
+        else:
+            self._turn_on_white(**kwargs)
+        self._light.update_state()
+
+    def _turn_on_rgb(self, **kwargs: Any) -> None:
         if new_rgb := kwargs.get(ATTR_RGB_COLOR):
             rgb_col = (int(new_rgb[0]), int(new_rgb[1]), int(new_rgb[2]))
         else:
@@ -103,7 +110,16 @@ class TelecoDaisyLight(LightEntity):
             rgb=rgb_col,
             brightness=int(brightness_to_value(BRIGHTNESS_SCALE, brightness)),
         )
-        self._light.update_state()
+
+    def _turn_on_white(self, **kwargs: Any) -> None:
+        if new_bright := kwargs.get(ATTR_BRIGHTNESS):
+            brightness = int(new_bright)
+        else:
+            brightness = self.brightness
+
+        self._light.set_brightness(
+            int(brightness_to_value(BRIGHTNESS_SCALE, brightness)),
+        )
 
     def turn_off(self, **kwargs: Any) -> None:
         self._light.turn_off()
