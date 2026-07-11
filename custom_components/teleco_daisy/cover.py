@@ -101,10 +101,14 @@ class TelecoDaisyCover(CoordinatorEntity, CoverEntity):
 
     @property
     def current_cover_position(self) -> int | None:
+        if isinstance(self._cover, DaisyRetractableSlatsCover):
+            return None
         return getattr(self._cover, "position", None)
 
     @property
     def current_cover_tilt_position(self) -> int | None:
+        if isinstance(self._cover, DaisyRetractableSlatsCover):
+            return self._cover.tilt_position
         return getattr(self._cover, "position", None)
 
     # @property
@@ -131,11 +135,17 @@ class TelecoDaisyCover(CoordinatorEntity, CoverEntity):
         await self._update_state()
 
     async def async_open_cover_tilt(self, **kwargs: Any) -> None:
-        await self._cover.open_cover()
+        if isinstance(self._cover, DaisyRetractableSlatsCover):
+            await self._cover.open_cover_tilt("100")
+        else:
+            await self._cover.open_cover()
         await self._update_state()
 
     async def async_close_cover_tilt(self, **kwargs: Any) -> None:
-        await self._cover.close_cover()
+        if isinstance(self._cover, DaisyRetractableSlatsCover):
+            await self._cover.open_cover_tilt("0")
+        else:
+            await self._cover.close_cover()
         await self._update_state()
 
     async def async_stop_cover_tilt(self, **kwargs: Any) -> None:
@@ -146,7 +156,20 @@ class TelecoDaisyCover(CoordinatorEntity, CoverEntity):
         await self._async_set_cover_position(kwargs[ATTR_POSITION])
 
     async def async_set_cover_tilt_position(self, **kwargs: Any) -> None:
-        await self._async_set_cover_position(kwargs[ATTR_TILT_POSITION])
+        position = kwargs[ATTR_TILT_POSITION]
+        if isinstance(self._cover, DaisyRetractableSlatsCover):
+            if position <= 16:
+                level = "0"
+            elif position <= 49:
+                level = "33"
+            elif position <= 83:
+                level = "66"
+            else:
+                level = "100"
+            await self._cover.open_cover_tilt(level)
+            await self._update_state()
+            return
+        await self._async_set_cover_position(position)
 
     async def _async_set_cover_position(self, position: int) -> None:
         if position <= 15:

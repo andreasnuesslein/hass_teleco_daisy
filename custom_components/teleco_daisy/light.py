@@ -111,10 +111,10 @@ class TelecoDaisyLight(CoordinatorEntity, LightEntity):
         else:
             rgb_col = self.rgb_color
 
-        if new_bright := kwargs.get(ATTR_BRIGHTNESS):
-            brightness = int(new_bright)
+        if ATTR_BRIGHTNESS in kwargs:
+            brightness = int(kwargs[ATTR_BRIGHTNESS])
         else:
-            brightness = self.brightness
+            brightness = 255
 
         await cast(DaisyRGBLight, self._light).set_rgb_and_brightness(
             rgb=rgb_col,
@@ -122,10 +122,10 @@ class TelecoDaisyLight(CoordinatorEntity, LightEntity):
         )
 
     async def _turn_on_white(self, **kwargs: Any) -> None:
-        if new_bright := kwargs.get(ATTR_BRIGHTNESS):
-            brightness = int(new_bright)
+        if ATTR_BRIGHTNESS in kwargs:
+            brightness = int(kwargs[ATTR_BRIGHTNESS])
         else:
-            brightness = self.brightness
+            brightness = 255
 
         await self._light.set_brightness(
             int(brightness_to_value(BRIGHTNESS_SCALE, brightness)),

@@ -4,6 +4,15 @@
 
 Home Assistant custom component for Teleco Automation Daisy
 
+## Supported devices
+
+- Lights
+- Awnings and shades
+- Slat and retractable-slat covers
+
+Retractable-slat covers expose a separate slat-angle selector with the four
+angles supported by Daisy: 0°, 45°, 90°, and 135°.
+
 ## Installation
 
 1. Copy `custom_components/hass_teleco_daisy` directory into your `custom_components` in your configuration directory.

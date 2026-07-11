@@ -172,7 +172,7 @@ class DaisySlatsCover(DaisyCover):
 
 
 class DaisyRetractableSlatsCover(DaisyCover):
-    position: int | None = None
+    tilt_position: int | None = None
 
     osc_map: dict[Literal["open", "stop", "close"], dict[str, Any]] = {
         "open": {"commandId": 206, "commandParam": "OPEN", "lowlevelCommand": "CH5"},
@@ -196,7 +196,7 @@ class DaisyRetractableSlatsCover(DaisyCover):
         stati = await super().update_state()
         for status in stati:
             if status.statusitemCode == "LEVEL":
-                self.position = int(status.statusValue)
+                self.tilt_position = int(status.statusValue)
         return stati
 
 
@@ -470,6 +470,26 @@ def create_specific_device(dev):
                 },
                 "close": {
                     "commandId": 65,
+                    "commandParam": "CLOSE",
+                    "lowlevelCommand": "CH8",
+                },
+            }
+            return DaisyAwningCover(**dev)
+
+        case {"idDevicetype": 22, "idDevicemodel": 24}:
+            dev["osc_map"] = {
+                "open": {
+                    "commandId": 72,
+                    "commandParam": "OPEN",
+                    "lowlevelCommand": "CH5",
+                },
+                "stop": {
+                    "commandId": 73,
+                    "commandParam": "STOP",
+                    "lowlevelCommand": "CH7",
+                },
+                "close": {
+                    "commandId": 74,
                     "commandParam": "CLOSE",
                     "lowlevelCommand": "CH8",
                 },
