@@ -376,6 +376,11 @@ class DaisyChannelLight(DaisyLight):
     feedback ("feedback": "N"), so state is assumed: on and off both fire
     the same channel command and the ack is ignored (a feedback-less
     device never reaches the "PROC" ack state).
+
+    Some receivers (e.g. the WiseBox 4) can instead memorise a channel
+    PAIR as dedicated on/off buttons. If the receiver was programmed that
+    way, set off_channel to the second channel of the pair and turn_off
+    fires it instead of re-firing the toggle.
     """
 
     # idDevicetypeCommandModel per channel, constant for devicetype 27 / model 41
@@ -390,26 +395,27 @@ class DaisyChannelLight(DaisyLight):
     }
 
     channel: str = "CH1"
+    off_channel: str | None = None
 
-    async def _press(self):
+    async def _press(self, channel: str):
         return await self.command(
             {
                 "commandAction": "CHANNEL",
                 "commandCode": "GEN_BUTT",
-                "commandParam": self.channel,
-                "commandId": self.channel_command_ids[self.channel],
-                "lowlevelCommand": self.channel,
+                "commandParam": channel,
+                "commandId": self.channel_command_ids[channel],
+                "lowlevelCommand": channel,
             },
             ignore_ack=True,
         )
 
     async def turn_on(self):
-        res = await self._press()
+        res = await self._press(self.channel)
         self.is_on = True
         return res
 
     async def turn_off(self):
-        res = await self._press()
+        res = await self._press(self.off_channel or self.channel)
         self.is_on = False
         return res
 
