@@ -1,5 +1,5 @@
 import asyncio
-from typing import Any, Literal
+from typing import Any, ClassVar, Literal
 
 import aiohttp
 from pydantic import BaseModel, ConfigDict
@@ -59,7 +59,7 @@ class DaisyDevice(DaisyBaseDevice):
     def __str__(self):
         return f'{self.__class__.__name__} "{self.label}"'
 
-    async def command(self, params: dict):
+    async def command(self, params: dict, ignore_ack: bool = False):
         return await self.client.feed_the_commands(
             installation=self.installation,
             commandsList=[
@@ -69,6 +69,7 @@ class DaisyDevice(DaisyBaseDevice):
                 }
                 | params
             ],
+            ignore_ack=ignore_ack,
         )
 
     async def update_state(self) -> list[DaisyStatus]:
@@ -366,6 +367,57 @@ class DaisyWhite4LevelLight(DaisyLight):
         return stati
 
 
+class DaisyChannelLight(DaisyLight):
+    """A single channel of Teleco's generic virtual remote (GEN_BUTT).
+
+    Devicetype 27 / devicemodel 41 is a generic multi-channel remote whose
+    buttons get memorised into a receiver. A receiver typically learns one
+    button as a toggle (press = on, press again = off) and reports no
+    feedback ("feedback": "N"), so state is assumed: on and off both fire
+    the same channel command and the ack is ignored (a feedback-less
+    device never reaches the "PROC" ack state).
+    """
+
+    # idDevicetypeCommandModel per channel, constant for devicetype 27 / model 41
+    channel_command_ids: ClassVar[dict[str, int]] = {
+        "CH1": 170,
+        "CH2": 171,
+        "CH3": 172,
+        "CH4": 173,
+        "CH5": 174,
+        "CH7": 175,
+        "CH8": 176,
+    }
+
+    channel: str = "CH1"
+
+    async def _press(self):
+        return await self.command(
+            {
+                "commandAction": "CHANNEL",
+                "commandCode": "GEN_BUTT",
+                "commandParam": self.channel,
+                "commandId": self.channel_command_ids[self.channel],
+                "lowlevelCommand": self.channel,
+            },
+            ignore_ack=True,
+        )
+
+    async def turn_on(self):
+        res = await self._press()
+        self.is_on = True
+        return res
+
+    async def turn_off(self):
+        res = await self._press()
+        self.is_on = False
+        return res
+
+    async def update_state(self):
+        # no feedback exists for this device; state is assumed
+        return []
+
+
 class DaisyHeater4CH(DaisyDevice):
     async def turn_on(self):
         return await self.command(
@@ -413,7 +465,20 @@ class DaisyHeater4CH(DaisyDevice):
         return await self.command({"commandAction": "LEVEL"} | cmd)
 
 
+# device classes that need no extra constructor data, by (idDevicetype, idDevicemodel)
+SIMPLE_DEVICE_CLASSES = {
+    (21, 20): DaisyHeater4CH,
+    (23, 32): DaisyRGBLight,
+    (24, 27): DaisySlatsCover,
+    (24, 44): DaisyRetractableSlatsCover,
+    (27, 41): DaisyChannelLight,
+}
+
+
 def create_specific_device(dev):
+    if cls := SIMPLE_DEVICE_CLASSES.get((dev["idDevicetype"], dev["idDevicemodel"])):
+        return cls(**dev)
+
     match dev:
         case {"idDevicetype": 21, "idDevicemodel": 17}:
             dev["brightness_map"] = {
@@ -427,9 +492,6 @@ def create_specific_device(dev):
                 },
             }
             return DaisyWhite4LevelLight(**dev)
-
-        case {"idDevicetype": 21, "idDevicemodel": 20}:
-            return DaisyHeater4CH(**dev)
 
         case {"idDevicetype": 21, "idDevicemodel": 34}:
             dev["brightness_map"] = {
@@ -515,13 +577,6 @@ def create_specific_device(dev):
                 },
             }
             return DaisyShadeCover(**dev)
-
-        case {"idDevicetype": 23, "idDevicemodel": 32}:
-            return DaisyRGBLight(**dev)
-        case {"idDevicetype": 24, "idDevicemodel": 27}:
-            return DaisySlatsCover(**dev)
-        case {"idDevicetype": 24, "idDevicemodel": 44}:
-            return DaisyRetractableSlatsCover(**dev)
 
         case _:
             return DaisyDevice(**dev)

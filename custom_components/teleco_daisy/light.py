@@ -17,7 +17,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util.color import brightness_to_value, value_to_brightness
 
 from .const import DOMAIN
-from .lib import DaisyLight, DaisyRGBLight, DaisyWhite4LevelLight
+from .lib import DaisyChannelLight, DaisyLight, DaisyRGBLight, DaisyWhite4LevelLight
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -63,6 +63,12 @@ class TelecoDaisyLight(CoordinatorEntity, LightEntity):
             self._attr_color_mode = ColorMode.BRIGHTNESS
             self._attr_supported_color_modes = {ColorMode.BRIGHTNESS}
 
+        elif isinstance(light, DaisyChannelLight):
+            self._attr_color_mode = ColorMode.ONOFF
+            self._attr_supported_color_modes = {ColorMode.ONOFF}
+            # the device gives no feedback: HA should offer both on and off
+            self._attr_assumed_state = True
+
     @property
     def device_info(self) -> DeviceInfo:
         return DeviceInfo(
@@ -101,6 +107,8 @@ class TelecoDaisyLight(CoordinatorEntity, LightEntity):
     async def async_turn_on(self, **kwargs: Any) -> None:
         if isinstance(self._light, DaisyRGBLight):
             await self._turn_on_rgb(**kwargs)
+        elif isinstance(self._light, DaisyChannelLight):
+            await self._light.turn_on()
         else:
             await self._turn_on_white(**kwargs)
         await self._update_state()
