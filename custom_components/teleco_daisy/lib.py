@@ -367,53 +367,40 @@ class DaisyWhite4LevelLight(DaisyLight):
 
 
 class DaisyHeater4CH(DaisyDevice):
+    is_on: bool | None = None
+    level: Any | None = None
+
+    oo_map: dict[Literal["on", "off"], dict[str, Any]]
+    level_map: dict[Literal["25", "50", "75", "100"], dict[str, Any]]
+
     async def turn_on(self):
-        return await self.command(
-            {
-                "commandAction": "POWER",
-                "commandParam": "ON",
-                "lowlevelCommand": "CH1",
-                "commandId": 58,
-            }
-        )
+        return await self.command(self.ool_map["on"])
 
     async def turn_off(self):
-        return await self.command(
-            {
-                "commandAction": "POWER",
-                "commandParam": "OFF",
-                "lowlevelCommand": "CH4",
-                "commandId": 59,
-            }
-        )
+        return await self.command(self.ool_map["off"])
 
-    async def set_level(self, level: Literal["50", "75", "100"]):
-        if level == "50":
-            cmd = {
-                # "idDevicetypeCommandModel": 60,
-                "commandId": 60,
-                "commandParam": "LEV2",
-                "lowlevelCommand": "CH3",
-            }
-        elif level == "75":
-            cmd = {
-                # "idDevicetypeCommandModel": 61,
-                "commandId": 61,
-                "commandParam": "LEV3",
-                "lowlevelCommand": "CH2",
-            }
-        else:
-            cmd = {
-                # "idDevicetypeCommandModel": 62,
-                "commandId": 62,
-                "commandParam": "LEV4",
-                "lowlevelCommand": "CH1",
-            }
+    async def set_level(self, level: Literal["25", "50", "75", "100"]):
+        return await self.command(self.level_map[level])
 
-        return await self.command({"commandAction": "LEVEL"} | cmd)
+    async def update_state(self):
+        stati = await super().update_state()
+        for status in stati:
+            if status.statusitemCode == "POWER":
+                self.is_on = status.statusValue == "ON"
+            elif status.statusitemCode == "LEVEL":
+                try:
+                    self.level = {
+                        "0": 0,
+                        "25": 25,
+                        "50": 50,
+                        "100": 100,
+                    }[status.statusValue]
+                except KeyError:
+                    self.level = 50
+        return stati
 
 
-def create_specific_device(dev):
+def create_specific_device(dev: dict):
     match dev:
         case {"idDevicetype": 21, "idDevicemodel": 17}:
             dev["brightness_map"] = {
@@ -428,7 +415,90 @@ def create_specific_device(dev):
             }
             return DaisyWhite4LevelLight(**dev)
 
+        case {"idDevicetype": 21, "idDevicemodel": 18}:
+            dev["oo_map"] = {
+                "on": {
+                    "commandAction": "POWER",
+                    "commandParam": "ON",
+                    "lowlevelCommand": "CH1",
+                    "commandId": 46,
+                },
+                "off": {
+                    "commandAction": "POWER",
+                    "commandParam": "OFF",
+                    "lowlevelCommand": "CH8",
+                    "commandId": 47,
+                },
+            }
+            dev["level_map"] = {
+                "25": {
+                    "commandAction": "LEVEL",
+                    "commandId": 48,
+                    "commandParam": "LEV1",
+                    "lowlevelCommand": "CH4",
+                },
+                "50": {
+                    "commandAction": "LEVEL",
+                    "commandId": 49,
+                    "commandParam": "LEV2",
+                    "lowlevelCommand": "CH3",
+                },
+                "75": {
+                    "commandAction": "LEVEL",
+                    "commandId": 50,
+                    "commandParam": "LEV3",
+                    "lowlevelCommand": "CH2",
+                },
+                "100": {
+                    "commandAction": "LEVEL",
+                    "commandId": 51,
+                    "commandParam": "LEV4",
+                    "lowlevelCommand": "CH1",
+                },
+            }
+            return DaisyHeater4CH(**dev)
+
         case {"idDevicetype": 21, "idDevicemodel": 20}:
+            dev["oo_map"] = {
+                "on": {
+                    "commandAction": "POWER",
+                    "commandParam": "ON",
+                    "lowlevelCommand": "CH1",
+                    "commandId": 58,
+                },
+                "off": {
+                    "commandAction": "POWER",
+                    "commandParam": "OFF",
+                    "lowlevelCommand": "CH4",
+                    "commandId": 59,
+                },
+            }
+            dev["level_map"] = {
+                "25": {
+                    "commandAction": "LEVEL",
+                    "commandId": 60,
+                    "commandParam": "LEV2",
+                    "lowlevelCommand": "CH3",
+                },  # FIXME incorrect
+                "50": {
+                    "commandAction": "LEVEL",
+                    "commandId": 60,
+                    "commandParam": "LEV2",
+                    "lowlevelCommand": "CH3",
+                },
+                "75": {
+                    "commandAction": "LEVEL",
+                    "commandId": 61,
+                    "commandParam": "LEV3",
+                    "lowlevelCommand": "CH2",
+                },
+                "100": {
+                    "commandAction": "LEVEL",
+                    "commandId": 62,
+                    "commandParam": "LEV4",
+                    "lowlevelCommand": "CH1",
+                },
+            }
             return DaisyHeater4CH(**dev)
 
         case {"idDevicetype": 21, "idDevicemodel": 34}:
